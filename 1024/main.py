@@ -2,11 +2,13 @@ import cv2
 import numpy as np
 
 from random import choice, randrange
+
 w = 1920
 h = 1080
 
-once = 16
-quart = 4
+once = 64
+quart = 16
+sixteens = 4
 
 hues = np.linspace(0, 180, once, endpoint=False)
 np.random.shuffle(hues)
@@ -37,29 +39,35 @@ for num in range(once):
 
     cv2.putText(img, text, pos, fontFace, fontScale, tuple(map(int, textColor)), thickness)
 
-
     cv2.imwrite(str(num) + '.png', img)
 
+print('Once done')
 
 def join_vert(i):
-    print(i)
-    img1 = cv2.imread(str(i    ) + '.png')
+    img1 = cv2.imread(str(i) + '.png')
     img2 = cv2.imread(str(i + 1) + '.png')
     return np.concatenate((img1, img2), axis=0)
 
 
 def join_imgs(i):
-    print(i)
-    vert1 = join_vert(i    )
+    vert1 = join_vert(i)
     vert2 = join_vert(i + 2)
     res = np.concatenate((vert1, vert2), axis=1)
     return cv2.resize(res, (w, h))
 
 
-for num in range(quart):
-    res = join_imgs(num * 4)
-    cv2.imwrite(str(num) + '.png', res)
+for i in range(quart):
+    res = join_imgs(i * 4)
+    cv2.imwrite(str(once + i) + '.png', res)
 
-final = join_imgs(0)
-cv2.imwrite('final.png', final)
+print('Fours done')
 
+for i in range(sixteens):
+    res = join_imgs(once + i * 4)
+    cv2.imwrite(str(once + quart + i) + '.png', res)
+
+print('Sixteens done')
+
+final = join_imgs(once + quart)
+cv2.imwrite(str(once + quart + sixteens) + '.png', final)
+print('Done.')
