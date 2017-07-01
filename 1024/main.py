@@ -8,12 +8,17 @@ h = 1080
 once = 32
 quart = 8
 
+hues = np.linspace(0, 180, once, endpoint=False)
+np.random.shuffle(hues)
+
 for num in range(once):
     channels = []
 
+    color = (hues[num], randrange(128) + 128, randrange(128) + 128)
+    color = cv2.cvtColor(np.array([[color]], np.uint8), cv2.COLOR_HSV2RGB)[0][0]
     for i in range(3):
         channels.append(np.empty([h, w]))
-        channels[i].fill(randrange(256))
+        channels[i].fill(color[i])
 
     img = cv2.merge(channels)
 
@@ -23,12 +28,16 @@ for num in range(once):
     fontScale = 15
     thickness = 60
 
-    color = (randrange(256), randrange(256), randrange(256))
+    textColor = cv2.cvtColor(np.array([[color]], np.uint8), cv2.COLOR_RGB2HSV)[0][0]
+    textColor[0] = (textColor[0] + 90) % 180
+    textColor[1] = 255
+    textColor[2] = 255
+    textColor = cv2.cvtColor(np.array([[textColor]], np.uint8), cv2.COLOR_HSV2RGB)[0][0]
 
     (tw, th), _ = cv2.getTextSize(text, fontFace, fontScale, thickness)
     pos = ((w - tw) // 2, (h + th) // 2)
 
-    cv2.putText(img, text, pos, fontFace, fontScale, color, thickness)
+    cv2.putText(img, text, pos, fontFace, fontScale, tuple(map(int, textColor)), thickness)
 
 
     cv2.imwrite(str(num) + '.png', img)
@@ -54,5 +63,4 @@ for num in range(once, once + quart):
 
 final = join_imgs(once, once + quart)
 cv2.imwrite('final.png', final)
-
 
